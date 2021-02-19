@@ -31,6 +31,9 @@ func main() {
 	if conf.SlackAppToken == "" {
 		log.Fatal("SlackAppToken is not set, must set it with Env-vars or .env")
 	}
+	if conf.ThreadStopMessage == "" {
+		log.Fatal("ThreadStopMessage is blank, must set it with Env-vars or .env")
+	}
 
 	client := slack.New(
 		conf.SlackBotToken,
@@ -74,7 +77,7 @@ func main() {
 				_, _, err := client.PostMessage(
 					event.Channel,
 					slack.MsgOptionText(
-						fmt.Sprintf(":no_entry: <@%v> :no_entry:\n真・スレッドストッパー。。。(￣ー￣)ﾆﾔﾘｯ\n\nこのチャンネルではスレッドの利用は推奨されていません。必要な場合は、チャンネルを新たに作り、話題を分けられるか検討してください。", event.User),
+						fmt.Sprintf(conf.ThreadStopMessage, event.User),
 						false,
 					),
 					slack.MsgOptionTS(event.ThreadTimeStamp),

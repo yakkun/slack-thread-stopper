@@ -11,7 +11,12 @@ func TestNew(t *testing.T) {
 		Debugging:     false,
 		SlackBotToken: "",
 		SlackAppToken: "",
+		ThreadStopMessage: ":no_entry: <@%v> :no_entry:\n" +
+			"真・スレッドストッパー。。。(￣ー￣)ﾆﾔﾘｯ\n" +
+			"\n" +
+			"このチャンネルではスレッドの利用は推奨されていません。必要な場合は、チャンネルを新たに作り、話題を分けられるか検討してください。",
 	}
+
 	if got.Debugging != want.Debugging {
 		t.Errorf("config.Debugging() = %#v; want: %#v", got.Debugging, want.Debugging)
 	}
@@ -20,6 +25,9 @@ func TestNew(t *testing.T) {
 	}
 	if got.SlackAppToken != want.SlackAppToken {
 		t.Errorf("config.SlackAppToken() = %#v; want: %#v", got.SlackAppToken, want.SlackAppToken)
+	}
+	if got.ThreadStopMessage != want.ThreadStopMessage {
+		t.Errorf("config.ThreadStopMessage() = %#v; want: %#v", got.ThreadStopMessage, want.ThreadStopMessage)
 	}
 }
 
@@ -77,5 +85,22 @@ func TestConfig_loadSlackAppToken(t *testing.T) {
 	}
 	if config.SlackAppToken != want {
 		t.Errorf("config.SlackAppToken = %#v; want: %#v", config.SlackAppToken, want)
+	}
+}
+
+func TestConfig_loadThreadStopMessage(t *testing.T) {
+	if value := os.Getenv("THREAD_STOP_MESSAGE"); value != "" {
+		os.Unsetenv("THREAD_STOP_MESSAGE")
+		defer func() { os.Setenv("THREAD_STOP_MESSAGE", value) }()
+	}
+
+	want := "some\nspecial\nmessage"
+	os.Setenv("THREAD_STOP_MESSAGE", want)
+	config := New()
+	if err := config.loadThreadStopMessage(); err != nil {
+		t.Fatalf("%#v", err)
+	}
+	if config.ThreadStopMessage != want {
+		t.Errorf("config.ThreadStopMessage = %#v; want: %#v", config.ThreadStopMessage, want)
 	}
 }
